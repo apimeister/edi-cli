@@ -1,0 +1,26 @@
+[package]
+name = "edi-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jens Walter <jens@apimeister.com>"]
+license = "MIT OR Apache-2.0"
+keywords = ["edi","x12","edifact"]
+repository = "https://github.com/apimeister/edi-cli/"
+documentation = "https://docs.rs/edi-cli/"
+description = "CLI tool for working with EDI files."
+
+[[bin]]
+name = "edi"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_x12 = { version = "0.5" }
+# serde_x12 = { path = "../serde_x12" }
+x12-types = "0.6"
+# x12-types = { path = "../x12-types" }
+serde_edifact = "0.1"
+edifact-types = "0.1"
+clap = "4"
+regex = "1"
+serde_json = "1"
