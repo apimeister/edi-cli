@@ -1,6 +1,12 @@
-use std::{fmt::Display, process};
-
+use std::{
+    fmt::Display,
+    fs::File,
+    io::{BufReader, Read},
+    process,
+};
+use lazy_static::lazy_static;
 use clap::{arg, Command};
+use encoding_rs::ISO_8859_16;
 use regex::Regex;
 
 fn main() {
@@ -34,13 +40,13 @@ fn main() {
     match matches.subcommand() {
         Some(("encoding", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILENAME").unwrap();
-            let str = std::fs::read_to_string(file_name).unwrap();
+            let str = read_file_with_unknown_encoding(file_name);
             let result = get_encoding(&str);
             println!("{result}");
-        },
+        }
         Some(("type", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILENAME").unwrap();
-            let str = std::fs::read_to_string(file_name).unwrap();
+            let str = read_file_with_unknown_encoding(file_name);
             let result = get_encoding(&str);
             match result {
                 Encoding::Unknown => {
@@ -56,10 +62,10 @@ fn main() {
                     println!("{}/{}", result.0, result.1);
                 }
             }
-        },
+        }
         Some(("edi2json", sub_matches)) => {
             let file_name = sub_matches.get_one::<String>("FILENAME").unwrap();
-            let str = std::fs::read_to_string(file_name).unwrap();
+            let str = read_file_with_unknown_encoding(file_name);
             let result = get_encoding(&str);
             match result {
                 Encoding::Unknown => {
@@ -75,11 +81,12 @@ fn main() {
                     let result = get_x12_type(&str).unwrap();
                     if result.1 == "310" {
                         let edi: x12_types::v004010::_310 = serde_x12::from_str(&str).unwrap();
-                        println!("{:?}",edi);
+                        println!("{:?}", edi);
                         return;
                     }
                     if result.1 == "315" {
-                        let edi: x12_types::v004010::Transmission<x12_types::v004010::_315> = serde_x12::from_str(&str).unwrap();
+                        let edi: x12_types::v004010::Transmission<x12_types::v004010::_315> =
+                            serde_x12::from_str(&str).unwrap();
                         let json_str = serde_json::to_string(&edi).unwrap();
                         println!("{json_str}");
                         return;
@@ -88,8 +95,27 @@ fn main() {
                     process::exit(1);
                 }
             }
-        },
+        }
         _ => unimplemented!("Exhausted list of subcommands"),
+    }
+}
+
+fn read_file_with_unknown_encoding(file_name: &str) -> String {
+    let file = File::open(file_name).unwrap();
+    let mut reader = BufReader::new(file);
+    let mut buffer = Vec::new();
+    reader.read_to_end(&mut buffer).unwrap();
+    // guess UT-8
+    let result = String::from_utf8(buffer.clone());
+    match result {
+        Ok(str) => str,
+        Err(_err) => {
+            let (cow, _encoding_used, had_errors) = ISO_8859_16.decode(&buffer);
+            if had_errors {
+                eprintln!("file is neither UTF-8 nor ISO8859-16, use ISO interpretation to go forward");
+            }
+            cow.to_string()
+        }
     }
 }
 
@@ -113,7 +139,7 @@ impl Display for Encoding {
 fn get_encoding(str: &str) -> Encoding {
     if str.starts_with("ISA") {
         Encoding::X12
-    } else if str.starts_with("UNB") {
+    } else if str.starts_with("UNB") || str.starts_with("UNA") {
         Encoding::Edifact
     } else {
         Encoding::Unknown
@@ -122,15 +148,22 @@ fn get_encoding(str: &str) -> Encoding {
 
 fn get_x12_type(str: &str) -> Result<(String, String), String> {
     //version
-    let re = Regex::new(r#"(GS.*)\~"#).unwrap();
-    let line = re.captures(str).unwrap();
-    let line2 = line.get(0).unwrap().as_str().to_string();
+    lazy_static! {
+        static ref RE: Regex = Regex::new(r#"(GS.*)(~ST)"#).unwrap();
+    }
+    let Some(line) = RE.captures(str) else {
+        eprintln!("cannot read header line");
+        process::exit(1);
+    };
+    let line2 = line.get(1).unwrap().as_str().to_string();
     let line3 = line2.trim_end_matches('~').to_string();
     let parts: Vec<&str> = line3.split('*').collect();
     let version = parts.get(8).unwrap();
     //doctype
-    let re = Regex::new(r#"(ST.*)\~"#).unwrap();
-    let line = re.captures(str).unwrap();
+    lazy_static! {
+        static ref RE2: Regex = Regex::new(r#"(ST.*)\~"#).unwrap();
+    }
+    let line = RE2.captures(str).unwrap();
     let line2 = line.get(0).unwrap().as_str().to_string();
     let line3 = line2.trim_end_matches('~').to_string();
     let parts: Vec<&str> = line3.split('*').collect();
@@ -141,11 +174,13 @@ fn get_x12_type(str: &str) -> Result<(String, String), String> {
 fn get_edifact_type(str: &str) -> Result<(String, String), String> {
     // UNH+2805567+IFTSTA:D:00B:UN'
     //version
-    let re = Regex::new(r#"(UNH.*)'"#).unwrap();
-    let line = re.captures(str).unwrap();
+    lazy_static! {
+        static ref RE: Regex = Regex::new(r#"(UNH.*)'"#).unwrap();
+    }
+    let line = RE.captures(str).unwrap();
     let line2 = line.get(0).unwrap().as_str().to_string();
     let line3 = line2.trim_end_matches('\'').to_string();
-    let parts: Vec<&str> = line3.split([':','+']).collect();
+    let parts: Vec<&str> = line3.split([':', '+']).collect();
     let ver1 = parts.get(3).unwrap();
     let ver2 = parts.get(4).unwrap();
     let version = format!("{}{}", ver1, ver2);
@@ -202,4 +237,26 @@ DTM+137:202201010021:203'"#;
     println!("{}/{}", version, doctype);
     assert_eq!(version, "D00B");
     assert_eq!(doctype, "IFTSTA");
+}
+
+#[test]
+fn check_for_una() {
+    let str = r#"UNA:+.? 'UNB+UNOC:3+SENDER+CRECEIVER+221121:1422+1291'UNH+"#;
+    let result = get_encoding(str);
+    println!("{:?}", result);
+    assert_eq!(result, Encoding::Edifact);
+}
+
+#[test]
+fn check_for_unb() {
+    let str = r#"UNB+UNOC:3+SNDR+RCVR+221121:1422+1291'UNH+"#;
+    let result = get_encoding(str);
+    println!("{:?}", result);
+    assert_eq!(result, Encoding::Edifact);
+}
+#[test]
+fn check_edifact_cuscar() {
+    let str = "UNB+UNOC:3+HKGHKG999+BLI-CUS+221121:0430+336'UNH+321+CUSCAR:D:96B:UN'BGM+85+CUSCAR/202211210430/+9'DTM+137:202211210430:203'RFF+AAZ:SUDU'NAD+MS+HSA'CTA+IC+:DAVID ZHANG/852-34788102'NAD+BA+HSA'TDT+20+246N+1+++++9178393:146:11:MERATUS MEDAN 5:ID'DTM+133:20221122:102'GIS+23'EQD+CN+MRKU7178024::ZZZ+22G1+++5'TSR++2:::2'MEA+AAE+T+KGM:2170'SEL+ML-ID0212928'EQD+CN+MSKU5705452::ZZZ+22G1+++5'TSR++2:::2'MEA+AAE+T+KGM:2180'SEL+ML-ID0212929'EQD+CN+GLDU5592412::ZZZ+22G1++";
+    let result = get_edifact_type(str).unwrap();
+    println!("{:?}", result);
 }

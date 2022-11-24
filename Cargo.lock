@@ -160,10 +160,12 @@ dependencies = [
 
 [[package]]
 name = "edi-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "clap",
  "edifact-types",
+ "encoding_rs",
+ "lazy_static",
  "regex",
  "serde",
  "serde_edifact",
@@ -180,6 +182,15 @@ checksum = "063876c76037d97aa9fa1cc00709e9d4fa40eb7514e9b75cab794e4033fcaf6e"
 dependencies = [
  "serde",
  "serde_edifact",
+]
+
+[[package]]
+name = "encoding_rs"
+version = "0.8.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9852635589dc9f9ea1b6fe9f05b50ef208c85c834a562f0c6abb1c475736ec2b"
+dependencies = [
+ "cfg-if",
 ]
 
 [[package]]
