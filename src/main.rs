@@ -1,39 +1,41 @@
+use clap::{arg, Command};
+use encoding_rs::ISO_8859_16;
+use lazy_static::lazy_static;
+use regex::Regex;
+use serde_json::Value;
 use std::{
     fmt::Display,
     fs::File,
     io::{BufReader, Read},
     process,
 };
-use lazy_static::lazy_static;
-use clap::{arg, Command};
-use encoding_rs::ISO_8859_16;
-use regex::Regex;
+use x12_types::v004010;
 
 fn main() {
     let matches = Command::new("edi")
-        .version("1.0")
+        .version("0.2")
         .about("Edi file processing")
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
             Command::new("edi2json")
                 .about("Transforms an EDI into a Json document")
-                .arg(arg!([FILENAME]).required(true)),
+                .arg(arg!([FILENAME] "input file, - for <stdin>").required(true)),
         )
         .subcommand(
             Command::new("json2edi")
                 .about("Transforms an Json into a EDI document")
-                .arg(arg!([FILENAME]).required(true)),
+                .arg(arg!([FILENAME] "input file, - for <stdin>").required(true)),
         )
         .subcommand(
             Command::new("encoding")
                 .about("returns either 'X12' or 'EDIFACT' if encoding can be determined, otherwise 'UNKNOWN'.")
-                .arg(arg!([FILENAME]).required(true)),
+                .arg(arg!([FILENAME] "input file, - for <stdin>").required(true)),
         )
         .subcommand(
             Command::new("type")
                 .about("returns the X12 or EDIFACT message type")
-                .arg(arg!([FILENAME]).required(true)),
+                .arg(arg!([FILENAME] "input file, - for <stdin>").required(true)),
         )
         .get_matches();
 
@@ -79,13 +81,19 @@ fn main() {
                 }
                 Encoding::X12 => {
                     let result = get_x12_type(&str).unwrap();
+                    // for the next version
+                    // if result.1 == "301" {
+                    //     let edi: v004010::Transmission<v004010::_301> = serde_x12::from_str(&str).unwrap();
+                    //     println!("{:?}", edi);
+                    //     return;
+                    // }
                     if result.1 == "310" {
-                        let edi: x12_types::v004010::_310 = serde_x12::from_str(&str).unwrap();
+                        let edi: v004010::Transmission<v004010::_310> = serde_x12::from_str(&str).unwrap();
                         println!("{:?}", edi);
                         return;
                     }
                     if result.1 == "315" {
-                        let edi: x12_types::v004010::Transmission<x12_types::v004010::_315> =
+                        let edi: v004010::Transmission<v004010::_315> =
                             serde_x12::from_str(&str).unwrap();
                         let json_str = serde_json::to_string(&edi).unwrap();
                         println!("{json_str}");
@@ -96,25 +104,68 @@ fn main() {
                 }
             }
         }
+        Some(("json2edi", sub_matches)) => {
+            let file_name = sub_matches.get_one::<String>("FILENAME").unwrap();
+            let str = read_file_with_unknown_encoding(file_name);
+            let val: Value = serde_json::from_str(&str).unwrap();
+            // guess encoding
+            let is_x12 = val.get("isa");
+            if is_x12.is_some() {
+                // X12 processing -> find type
+                let fg = val.get("functional_group").unwrap();
+                let fg1 = fg.as_array().unwrap().get(0).unwrap();
+                let version = fg1.get("gs").unwrap().get("08").unwrap().as_str().unwrap();
+                let segments = fg1.get("segments").unwrap();
+                let segment1 = segments.as_array().unwrap().get(0).unwrap();
+                let st = segment1.get("st").unwrap();
+                let type_name = st.get("01").unwrap().as_str().unwrap();
+                match (version, type_name) {
+                    ("004010","315") => {
+                        let edi: v004010::Transmission<v004010::_315> = serde_json::de::from_str(&str).unwrap();
+                        let target_str = serde_x12::to_string(&edi).unwrap();
+                        println!("{target_str}");
+                    },
+                    _ => {
+                        unimplemented!()
+                    }
+                }
+            } else {
+                // EDIFACT processing
+                eprintln!("Edifact not yet supported.");
+                process::exit(1);
+            }
+        }
         _ => unimplemented!("Exhausted list of subcommands"),
     }
 }
 
 fn read_file_with_unknown_encoding(file_name: &str) -> String {
-    let file = File::open(file_name).unwrap();
-    let mut reader = BufReader::new(file);
-    let mut buffer = Vec::new();
-    reader.read_to_end(&mut buffer).unwrap();
-    // guess UT-8
-    let result = String::from_utf8(buffer.clone());
-    match result {
-        Ok(str) => str,
-        Err(_err) => {
-            let (cow, _encoding_used, had_errors) = ISO_8859_16.decode(&buffer);
-            if had_errors {
-                eprintln!("file is neither UTF-8 nor ISO8859-16, use ISO interpretation to go forward");
+    // check for stdin option
+    if file_name == "-" {
+        let mut buffer = String::new();
+        let stdin = std::io::stdin();
+        let lines = stdin.lines();
+        for line in lines {
+            let x = line.unwrap();
+            buffer.push_str(&x);
+        }
+        buffer
+    } else {
+        let file = File::open(file_name).unwrap();
+        let mut reader = BufReader::new(file);
+        let mut buffer = Vec::new();
+        reader.read_to_end(&mut buffer).unwrap();
+        // guess UT-8
+        let result = String::from_utf8(buffer.clone());
+        match result {
+            Ok(str) => str,
+            Err(_err) => {
+                let (cow, _encoding_used, had_errors) = ISO_8859_16.decode(&buffer);
+                if had_errors {
+                    eprintln!("file is neither UTF-8 nor ISO8859-16, use ISO interpretation to go forward");
+                }
+                cow.to_string()
             }
-            cow.to_string()
         }
     }
 }
@@ -161,7 +212,7 @@ fn get_x12_type(str: &str) -> Result<(String, String), String> {
     let version = parts.get(8).unwrap();
     //doctype
     lazy_static! {
-        static ref RE2: Regex = Regex::new(r#"(ST.*)\~"#).unwrap();
+        static ref RE2: Regex = Regex::new(r#"\~(ST.*)\~"#).unwrap();
     }
     let line = RE2.captures(str).unwrap();
     let line2 = line.get(0).unwrap().as_str().to_string();
