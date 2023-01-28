@@ -88,7 +88,8 @@ fn main() {
                     //     return;
                     // }
                     if result.1 == "310" {
-                        let edi: v004010::Transmission<v004010::_310> = serde_x12::from_str(&str).unwrap();
+                        let edi: v004010::Transmission<v004010::_310> =
+                            serde_x12::from_str(&str).unwrap();
                         println!("{edi:?}");
                         return;
                     }
@@ -120,11 +121,12 @@ fn main() {
                 let st = segment1.get("st").unwrap();
                 let type_name = st.get("01").unwrap().as_str().unwrap();
                 match (version, type_name) {
-                    ("004010","315") => {
-                        let edi: v004010::Transmission<v004010::_315> = serde_json::de::from_str(&str).unwrap();
+                    ("004010", "315") => {
+                        let edi: v004010::Transmission<v004010::_315> =
+                            serde_json::de::from_str(&str).unwrap();
                         let target_str = serde_x12::to_string(&edi).unwrap();
                         println!("{target_str}");
-                    },
+                    }
                     _ => {
                         unimplemented!()
                     }
