@@ -89,7 +89,7 @@ fn main() {
                     // }
                     if result.1 == "310" {
                         let edi: v004010::Transmission<v004010::_310> = serde_x12::from_str(&str).unwrap();
-                        println!("{:?}", edi);
+                        println!("{edi:?}");
                         return;
                     }
                     if result.1 == "315" {
@@ -234,7 +234,7 @@ fn get_edifact_type(str: &str) -> Result<(String, String), String> {
     let parts: Vec<&str> = line3.split([':', '+']).collect();
     let ver1 = parts.get(3).unwrap();
     let ver2 = parts.get(4).unwrap();
-    let version = format!("{}{}", ver1, ver2);
+    let version = format!("{ver1}{ver2}");
     let doctype = parts.get(2).unwrap();
     Ok((version, doctype.to_string()))
 }
