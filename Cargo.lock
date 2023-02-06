@@ -157,7 +157,7 @@ dependencies = [
  "lazy_static",
  "regex",
  "serde",
- "serde_edifact",
+ "serde_edifact 0.3.0",
  "serde_json",
  "serde_x12",
  "x12-types",
@@ -170,7 +170,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e20a7ad57a37fa1e2cecc81fa8b8dce2e821f244479901d6421a7fecdd17953d"
 dependencies = [
  "serde",
- "serde_edifact",
+ "serde_edifact 0.2.0",
 ]
 
 [[package]]
@@ -516,6 +516,15 @@ name = "serde_edifact"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46c27ee3faf49f414ce2076716d762927f8f80291ddfe29fac5e67f0946f8ba2"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "serde_edifact"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "45b2b29ed00edb4f32191dd3fc14693978a4aeae8459bca795474022e6b02ca7"
 dependencies = [
  "serde",
 ]
