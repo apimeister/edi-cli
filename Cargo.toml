@@ -15,7 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-serde_x12 = { version = "0.6" }
+serde_x12 = { version = "0.7" }
 # serde_x12 = { path = "../serde_x12" }
 x12-types = "0.7"
 # x12-types = { path = "../x12-types" }

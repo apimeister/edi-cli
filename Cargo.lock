@@ -212,7 +212,7 @@ dependencies = [
  "serde",
  "serde_edifact",
  "serde_json",
- "serde_x12",
+ "serde_x12 0.7.1",
  "x12-types",
 ]
 
@@ -389,6 +389,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f232d6ef707e1956a43342693d2a31e72989554d58299d7a88738cc95b0d35c"
 
 [[package]]
+name = "minimal-lexical"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
+
+[[package]]
+name = "nom"
+version = "7.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
+dependencies = [
+ "memchr",
+ "minimal-lexical",
+]
+
+[[package]]
 name = "num-integer"
 version = "0.1.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -557,6 +573,17 @@ dependencies = [
  "json_dotpath",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "serde_x12"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f28914780747a0541106c80be734b3474f2d0e4cd159baf9540c9f0907e3070"
+dependencies = [
+ "nom",
+ "serde",
+ "x12-types",
 ]
 
 [[package]]
@@ -918,6 +945,6 @@ checksum = "7e617540e64c0a1b3c2d4d7edc7377ab6976daa38062720b1bf1cc6acdb5db22"
 dependencies = [
  "chrono",
  "serde",
- "serde_x12",
+ "serde_x12 0.6.0",
  "validator",
 ]
