@@ -1,3 +1,7 @@
+# 0.2.1 2023-10-01
+
+* deps
+
 # 0.2.0 2022-12-04
 
 * support UNA for Edifact

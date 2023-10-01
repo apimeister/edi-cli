@@ -13,7 +13,7 @@ use x12_types::v004010;
 
 fn main() {
     let matches = Command::new("edi")
-        .version("0.2")
+        .version(std::env!("CARGO_PKG_VERSION"))
         .about("Edi file processing")
         .subcommand_required(true)
         .arg_required_else_help(true)
