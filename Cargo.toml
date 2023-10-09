@@ -19,7 +19,7 @@ serde_x12 = { version = "0.7" }
 # serde_x12 = { path = "../serde_x12" }
 x12-types = "0.7"
 # x12-types = { path = "../x12-types" }
-serde_edifact = "0.3"
+serde_edifact = "0.4"
 edifact-types = "0.3"
 clap = "4"
 regex = "1"
