@@ -159,7 +159,7 @@ name = "edi-cli"
 version = "0.2.1"
 dependencies = [
  "clap",
- "edifact-types",
+ "edifact-types 0.3.2",
  "encoding_rs",
  "lazy_static",
  "regex",
@@ -180,9 +180,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde",
- "strum",
- "strum_macros",
+ "strum 0.24.1",
+ "strum_macros 0.24.3",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "edifact-types"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e386c84cd67af80a48e458772151cd5ffb0e217d999d7753a2266b3fff2d075"
+dependencies = [
+ "edifact-types-macros",
+ "nom",
+ "serde",
+ "strum 0.25.0",
+ "strum_macros 0.25.2",
 ]
 
 [[package]]
@@ -442,10 +455,12 @@ dependencies = [
 
 [[package]]
 name = "serde_edifact"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45b2b29ed00edb4f32191dd3fc14693978a4aeae8459bca795474022e6b02ca7"
+checksum = "77d5667af14ab07fcf174e3cbf5c4e3efda3fa946371966396e0c2c9ab7ad4f2"
 dependencies = [
+ "edifact-types 0.4.0",
+ "nom",
  "serde",
 ]
 
@@ -484,6 +499,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "063e6045c0e62079840579a7e47a355ae92f60eb74daaf156fb1e84ba164e63f"
 
 [[package]]
+name = "strum"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "290d54ea6f91c969195bdbcd7442c8c2a2ba87da8bf60a7ee86a235d4bc1e125"
+
+[[package]]
 name = "strum_macros"
 version = "0.24.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -494,6 +515,19 @@ dependencies = [
  "quote",
  "rustversion",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "strum_macros"
+version = "0.25.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad8d03b598d3d0fff69bf533ee3ef19b8eeb342729596df84bcc7e1f96ec4059"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn 2.0.37",
 ]
 
 [[package]]
