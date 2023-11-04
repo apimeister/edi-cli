@@ -75,8 +75,8 @@ fn main() {
                     process::exit(1);
                 }
                 Encoding::Edifact => {
-                    let result = get_edifact_type(&str).unwrap();
-                    eprintln!("Edifact type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",result.0,result.1);
+                    let (version, _type) = get_edifact_type(&str).unwrap();
+                    eprintln!("Edifact type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",version,_type);
                     process::exit(1);
                 }
                 Encoding::X12 => {
@@ -98,7 +98,7 @@ fn main() {
                             return;
                         }
                         _ => {
-                            eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",result.0,result.1);
+                            eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",version,_type);
                             process::exit(1);
                         }
                     }
@@ -208,7 +208,7 @@ fn get_encoding(str: &str) -> Encoding {
 fn get_x12_type(str: &str) -> Result<(String, String), String> {
     //version
     lazy_static! {
-        static ref RE: Regex = Regex::new(r#"(GS.*)(~\n?ST)"#).unwrap();
+        static ref RE: Regex = Regex::new(r"(GS.*)(~\n?ST)").unwrap();
     }
     let Some(line) = RE.captures(str) else {
         eprintln!("cannot read header line");
@@ -220,7 +220,7 @@ fn get_x12_type(str: &str) -> Result<(String, String), String> {
     let version = parts.get(8).unwrap();
     //doctype
     lazy_static! {
-        static ref RE2: Regex = Regex::new(r#"\~\n?(ST.*)\~"#).unwrap();
+        static ref RE2: Regex = Regex::new(r"\~\n?(ST.*)\~").unwrap();
     }
     let line = RE2.captures(str).unwrap();
     let line2 = line.get(0).unwrap().as_str().to_string();

@@ -159,11 +159,10 @@ name = "edi-cli"
 version = "0.3.0"
 dependencies = [
  "clap",
+ "edifact-types",
  "encoding_rs",
  "lazy_static",
  "regex",
- "serde",
- "serde_edifact",
  "serde_json",
  "x12-types",
 ]
@@ -434,17 +433,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.38",
-]
-
-[[package]]
-name = "serde_edifact"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77d5667af14ab07fcf174e3cbf5c4e3efda3fa946371966396e0c2c9ab7ad4f2"
-dependencies = [
- "edifact-types",
- "nom",
- "serde",
 ]
 
 [[package]]
