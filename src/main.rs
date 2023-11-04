@@ -9,7 +9,7 @@ use std::{
     io::{BufReader, Read},
     process,
 };
-use x12_types::v004010;
+use x12_types::{util::Parser, v004010};
 
 fn main() {
     let matches = Command::new("edi")
@@ -80,28 +80,28 @@ fn main() {
                     process::exit(1);
                 }
                 Encoding::X12 => {
-                    let result = get_x12_type(&str).unwrap();
-                    // for the next version
-                    // if result.1 == "301" {
-                    //     let edi: v004010::Transmission<v004010::_301> = serde_x12::from_str(&str).unwrap();
-                    //     println!("{:?}", edi);
-                    //     return;
-                    // }
-                    if result.1 == "310" {
-                        let edi: v004010::Transmission<v004010::_310> =
-                            serde_x12::from_str(&str).unwrap();
-                        println!("{edi:?}");
-                        return;
+                    let (version, _type) = get_x12_type(&str).unwrap();
+                    match (version.as_str(), _type.as_str()) {
+                        ("004010", "310") => {
+                            let (rest, edi) =
+                                x12_types::v004010::Transmission::<v004010::_310>::parse(&str)
+                                    .unwrap();
+                            let json_str = serde_json::to_string(&edi).unwrap();
+                            println!("{json_str}");
+                            return;
+                        }
+                        ("004010", "315") => {
+                            let (rest, edi) =
+                                v004010::Transmission::<v004010::_315>::parse(&str).unwrap();
+                            let json_str = serde_json::to_string(&edi).unwrap();
+                            println!("{json_str}");
+                            return;
+                        }
+                        _ => {
+                            eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",result.0,result.1);
+                            process::exit(1);
+                        }
                     }
-                    if result.1 == "315" {
-                        let edi: v004010::Transmission<v004010::_315> =
-                            serde_x12::from_str(&str).unwrap();
-                        let json_str = serde_json::to_string(&edi).unwrap();
-                        println!("{json_str}");
-                        return;
-                    }
-                    eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",result.0,result.1);
-                    process::exit(1);
                 }
             }
         }
@@ -121,10 +121,16 @@ fn main() {
                 let st = segment1.get("st").unwrap();
                 let type_name = st.get("01").unwrap().as_str().unwrap();
                 match (version, type_name) {
+                    ("004010", "310") => {
+                        let edi: v004010::Transmission<v004010::_310> =
+                            serde_json::de::from_str(&str).unwrap();
+                        let target_str = edi.to_string();
+                        println!("{target_str}");
+                    }
                     ("004010", "315") => {
                         let edi: v004010::Transmission<v004010::_315> =
                             serde_json::de::from_str(&str).unwrap();
-                        let target_str = serde_x12::to_string(&edi).unwrap();
+                        let target_str = edi.to_string();
                         println!("{target_str}");
                     }
                     _ => {

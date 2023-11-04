@@ -1,6 +1,6 @@
 [package]
 name = "edi-cli"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 authors = ["Jens Walter <jens@apimeister.com>"]
 license = "MIT OR Apache-2.0"
@@ -15,12 +15,8 @@ path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-serde_x12 = { version = "0.7" }
-# serde_x12 = { path = "../serde_x12" }
-x12-types = "0.7"
-# x12-types = { path = "../x12-types" }
+x12-types = "0.8"
 serde_edifact = "0.4"
-edifact-types = "0.4"
 clap = "4"
 regex = "1"
 serde_json = "1"
