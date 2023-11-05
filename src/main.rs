@@ -9,7 +9,7 @@ use std::{
     io::{BufReader, Read},
     process,
 };
-use x12_types::{util::Parser, v004010};
+use x12_types::{util::Parser, *};
 
 fn main() {
     let matches = Command::new("edi")
@@ -81,27 +81,83 @@ fn main() {
                 }
                 Encoding::X12 => {
                     let (version, _type) = get_x12_type(&str).unwrap();
-                    match (version.as_str(), _type.as_str()) {
+                    let json_str = match (version.as_str(), _type.as_str()) {
+                        ("003030", "998") => {
+                            let (_rest, edi) =
+                                v003030::Transmission::<v003030::_998>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("004010", "204") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_204>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        // ("004010", "214") => {
+                        //     let (_rest, edi) =
+                        //         v004010::Transmission::<v004010::_214>::parse(&str).unwrap();
+                        //     serde_json::to_string(&edi).unwrap()
+                        // }
+                        ("004010", "309") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_309>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
                         ("004010", "310") => {
-                            let (rest, edi) =
-                                x12_types::v004010::Transmission::<v004010::_310>::parse(&str)
-                                    .unwrap();
-                            let json_str = serde_json::to_string(&edi).unwrap();
-                            println!("{json_str}");
-                            return;
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_310>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
                         }
                         ("004010", "315") => {
-                            let (rest, edi) =
+                            let (_rest, edi) =
                                 v004010::Transmission::<v004010::_315>::parse(&str).unwrap();
-                            let json_str = serde_json::to_string(&edi).unwrap();
-                            println!("{json_str}");
-                            return;
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        // ("004010", "322") => {
+                        //     let (_rest, edi) =
+                        //         v004010::Transmission::<v004010::_322>::parse(&str).unwrap();
+                        //     serde_json::to_string(&edi).unwrap()
+                        // }
+                        ("004010", "404") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_404>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        // ("004010", "997") => {
+                        //     let (_rest, edi) =
+                        //         v004010::Transmission::<v004010::_997>::parse(&str).unwrap();
+                        //     serde_json::to_string(&edi).unwrap()
+                        // }
+                        ("004010", "998") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_998>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "834") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_834>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "835") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_835>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "837") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_837>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005030", "404") => {
+                            let (_rest, edi) =
+                                v005030::Transmission::<v005030::_404>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
                         }
                         _ => {
                             eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",version,_type);
                             process::exit(1);
                         }
-                    }
+                    };
+                    println!("{json_str}");
                 }
             }
         }
@@ -120,23 +176,77 @@ fn main() {
                 let segment1 = segments.as_array().unwrap().get(0).unwrap();
                 let st = segment1.get("st").unwrap();
                 let type_name = st.get("01").unwrap().as_str().unwrap();
-                match (version, type_name) {
+                let edi = match (version, type_name) {
+                    ("003030", "998") => {
+                        let edi: v003030::Transmission<v003030::_998> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("004010", "204") => {
+                        let edi: v004010::Transmission<v004010::_204> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("004010", "309") => {
+                        let edi: v004010::Transmission<v004010::_309> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
                     ("004010", "310") => {
                         let edi: v004010::Transmission<v004010::_310> =
                             serde_json::de::from_str(&str).unwrap();
-                        let target_str = edi.to_string();
-                        println!("{target_str}");
+                        format!("{edi}")
                     }
                     ("004010", "315") => {
                         let edi: v004010::Transmission<v004010::_315> =
                             serde_json::de::from_str(&str).unwrap();
-                        let target_str = edi.to_string();
-                        println!("{target_str}");
+                        format!("{edi}")
+                    }
+                    ("004010", "322") => {
+                        let edi: v004010::Transmission<v004010::_322> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("004010", "404") => {
+                        let edi: v004010::Transmission<v004010::_404> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("004010", "997") => {
+                        let edi: v004010::Transmission<v004010::_997> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("004010", "998") => {
+                        let edi: v004010::Transmission<v004010::_998> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "834") => {
+                        let edi: v005010::Transmission<v005010::_834> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "835") => {
+                        let edi: v005010::Transmission<v005010::_835> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "837") => {
+                        let edi: v005010::Transmission<v005010::_837> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005030", "404") => {
+                        let edi: v005030::Transmission<v005030::_404> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
                     }
                     _ => {
                         unimplemented!()
                     }
-                }
+                };
+                println!("{edi}");
             } else {
                 // EDIFACT processing
                 eprintln!("Edifact not yet supported.");

@@ -4,8 +4,8 @@ CLI tool for working with EDI files.
 
 This crate is still a work in progress.
 
-Edifact implementation is based on the `edifact-types` crate.
-X12 implementation is based ont the `x12-types` crate.
+Edifact implementation is based on the [edifact-types](https://crates.io/crates/edifact-types) crate.
+X12 implementation is based ont the [x12-types](https://crates.io/crates/x12-types) crate.
 
 # Install
 
