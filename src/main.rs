@@ -364,6 +364,7 @@ GS*IO*SOURCE*TARGET*20220101*1449*61716*X*004010~"#;
     let result = get_encoding(str);
     assert_eq!(result, Encoding::X12);
 }
+
 #[test]
 fn valid_edifact_document() {
     let str = r#"UNB+UNOC:2+SENDER:ZZZ+RECEIVER:ZZZ+220101:1021+2803570'
@@ -371,18 +372,21 @@ UNH+2805567+IFTSTA:D:00B:UN'"#;
     let result = get_encoding(str);
     assert_eq!(result, Encoding::Edifact);
 }
+
 #[test]
 fn unknown_document1() {
     let str = "test123";
     let result = get_encoding(str);
     assert_eq!(result, Encoding::Unknown);
 }
+
 #[test]
 fn unknown_document2() {
     let str = "";
     let result = get_encoding(str);
     assert_eq!(result, Encoding::Unknown);
 }
+
 #[test]
 fn x12_type_extract() {
     let str = r#"GS*IO*SOURCE*TARGET*20220101*1449*61716*X*004010~
@@ -394,6 +398,7 @@ ST*310*35353~"#;
     assert_eq!(version, "004010");
     assert_eq!(doctype, "310");
 }
+
 #[test]
 fn edifact_type_extract() {
     let str = r#"UNB+UNOC:2+SENDER:ZZZ+RECEIVER:ZZZ+220101:1021+2803570'
@@ -423,6 +428,7 @@ fn check_for_unb() {
     println!("{:?}", result);
     assert_eq!(result, Encoding::Edifact);
 }
+
 #[test]
 fn check_edifact_cuscar() {
     let str = "UNB+UNOC:3+HKGHKG999+BLI-CUS+221121:0430+336'UNH+321+CUSCAR:D:96B:UN'BGM+85+CUSCAR/202211210430/+9'DTM+137:202211210430:203'RFF+AAZ:SUDU'NAD+MS+HSA'CTA+IC+:DAVID ZHANG/852-34788102'NAD+BA+HSA'TDT+20+246N+1+++++9178393:146:11:MERATUS MEDAN 5:ID'DTM+133:20221122:102'GIS+23'EQD+CN+MRKU7178024::ZZZ+22G1+++5'TSR++2:::2'MEA+AAE+T+KGM:2170'SEL+ML-ID0212928'EQD+CN+MSKU5705452::ZZZ+22G1+++5'TSR++2:::2'MEA+AAE+T+KGM:2180'SEL+ML-ID0212929'EQD+CN+GLDU5592412::ZZZ+22G1++";
