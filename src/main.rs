@@ -170,10 +170,10 @@ fn main() {
             if is_x12.is_some() {
                 // X12 processing -> find type
                 let fg = val.get("functional_group").unwrap();
-                let fg1 = fg.as_array().unwrap().get(0).unwrap();
+                let fg1 = fg.as_array().unwrap().first().unwrap();
                 let version = fg1.get("gs").unwrap().get("08").unwrap().as_str().unwrap();
                 let segments = fg1.get("segments").unwrap();
-                let segment1 = segments.as_array().unwrap().get(0).unwrap();
+                let segment1 = segments.as_array().unwrap().first().unwrap();
                 let st = segment1.get("st").unwrap();
                 let type_name = st.get("01").unwrap().as_str().unwrap();
                 let edi = match (version, type_name) {
