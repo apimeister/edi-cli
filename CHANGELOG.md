@@ -1,3 +1,7 @@
+# 0.3.1 2024-06-10
+
+* update dependencies
+
 # 0.3.0 2023-11-05
 
 * remove serde
