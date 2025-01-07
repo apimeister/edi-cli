@@ -1,6 +1,6 @@
 [package]
 name = "edi-cli"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 authors = ["Jens Walter <jens@apimeister.com>"]
 license = "MIT OR Apache-2.0"
@@ -8,6 +8,7 @@ keywords = ["edi","x12","edifact"]
 repository = "https://github.com/apimeister/edi-cli/"
 documentation = "https://docs.rs/edi-cli/"
 description = "CLI tool for working with EDI files."
+rust-version = "1.78"
 
 [[bin]]
 name = "edi"
