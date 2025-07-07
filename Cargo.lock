@@ -221,7 +221,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a674522adab6f1f9365e734f06fc627d463f0d406debeb50a397a07c069a587b"
 dependencies = [
  "edifact-types-macros",
- "nom 8.0.0",
+ "nom",
  "serde",
  "strum",
  "strum_macros",
@@ -496,22 +496,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
-name = "minimal-lexical"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
-
-[[package]]
-name = "nom"
-version = "7.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
-dependencies = [
- "memchr",
- "minimal-lexical",
-]
-
-[[package]]
 name = "nom"
 version = "8.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -766,9 +750,9 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "validator"
-version = "0.19.0"
+version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0b4a29d8709210980a09379f27ee31549b73292c87ab9899beee1c0d3be6303"
+checksum = "43fb22e1a008ece370ce08a3e9e4447a910e92621bb49b85d6e48a45397e7cfa"
 dependencies = [
  "idna",
  "once_cell",
@@ -782,9 +766,9 @@ dependencies = [
 
 [[package]]
 name = "validator_derive"
-version = "0.19.0"
+version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bac855a2ce6f843beb229757e6e570a42e837bcb15e5f449dd48d5747d41bf77"
+checksum = "b7df16e474ef958526d1205f6dda359fdfab79d9aa6d54bafcb92dcd07673dca"
 dependencies = [
  "darling",
  "once_cell",
@@ -944,12 +928,13 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "x12-types"
-version = "0.8.5"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aeddfe5a3c2bbdc952a1542b2cfdf2b65884f496d09ac076215d0e3b516820a5"
+checksum = "4824ee955a09b9b0c26f9f77505f4885af02c25067b901b849f5a4b6be24228d"
 dependencies = [
  "chrono",
- "nom 7.1.3",
+ "log",
+ "nom",
  "serde",
  "validator",
  "x12-types-macros",
