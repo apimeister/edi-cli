@@ -92,11 +92,11 @@ fn main() {
                                 v004010::Transmission::<v004010::_204>::parse(&str).unwrap();
                             serde_json::to_string(&edi).unwrap()
                         }
-                        // ("004010", "214") => {
-                        //     let (_rest, edi) =
-                        //         v004010::Transmission::<v004010::_214>::parse(&str).unwrap();
-                        //     serde_json::to_string(&edi).unwrap()
-                        // }
+                        ("004010", "214") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_214>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
                         ("004010", "309") => {
                             let (_rest, edi) =
                                 v004010::Transmission::<v004010::_309>::parse(&str).unwrap();
@@ -112,26 +112,27 @@ fn main() {
                                 v004010::Transmission::<v004010::_315>::parse(&str).unwrap();
                             serde_json::to_string(&edi).unwrap()
                         }
-                        // ("004010", "322") => {
-                        //     let (_rest, edi) =
-                        //         v004010::Transmission::<v004010::_322>::parse(&str).unwrap();
-                        //     serde_json::to_string(&edi).unwrap()
-                        // }
+                        ("004010", "322") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_322>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
                         ("004010", "404") => {
                             let (_rest, edi) =
                                 v004010::Transmission::<v004010::_404>::parse(&str).unwrap();
                             serde_json::to_string(&edi).unwrap()
                         }
-                        // ("004010", "997") => {
-                        //     let (_rest, edi) =
-                        //         v004010::Transmission::<v004010::_997>::parse(&str).unwrap();
-                        //     serde_json::to_string(&edi).unwrap()
-                        // }
+                        ("004010", "997") => {
+                            let (_rest, edi) =
+                                v004010::Transmission::<v004010::_997>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
                         ("004010", "998") => {
                             let (_rest, edi) =
                                 v004010::Transmission::<v004010::_998>::parse(&str).unwrap();
                             serde_json::to_string(&edi).unwrap()
                         }
+
                         ("005010", "834") => {
                             let (_rest, edi) =
                                 v005010::Transmission::<v005010::_834>::parse(&str).unwrap();
@@ -147,6 +148,37 @@ fn main() {
                                 v005010::Transmission::<v005010::_837>::parse(&str).unwrap();
                             serde_json::to_string(&edi).unwrap()
                         }
+                        ("005010", "270") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_270>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "271") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_271>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "276") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_276>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "277") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_277>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "820") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_820>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+                        ("005010", "999") => {
+                            let (_rest, edi) =
+                                v005010::Transmission::<v005010::_999>::parse(&str).unwrap();
+                            serde_json::to_string(&edi).unwrap()
+                        }
+
                         ("005030", "404") => {
                             let (_rest, edi) =
                                 v005030::Transmission::<v005030::_404>::parse(&str).unwrap();
@@ -184,6 +216,11 @@ fn main() {
                     }
                     ("004010", "204") => {
                         let edi: v004010::Transmission<v004010::_204> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("004010", "214") => {
+                        let edi: v004010::Transmission<v004010::_214> =
                             serde_json::de::from_str(&str).unwrap();
                         format!("{edi}")
                     }
@@ -234,6 +271,36 @@ fn main() {
                     }
                     ("005010", "837") => {
                         let edi: v005010::Transmission<v005010::_837> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "270") => {
+                        let edi: v005010::Transmission<v005010::_270> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "271") => {
+                        let edi: v005010::Transmission<v005010::_271> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "276") => {
+                        let edi: v005010::Transmission<v005010::_276> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "277") => {
+                        let edi: v005010::Transmission<v005010::_277> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "820") => {
+                        let edi: v005010::Transmission<v005010::_820> =
+                            serde_json::de::from_str(&str).unwrap();
+                        format!("{edi}")
+                    }
+                    ("005010", "999") => {
+                        let edi: v005010::Transmission<v005010::_999> =
                             serde_json::de::from_str(&str).unwrap();
                         format!("{edi}")
                     }

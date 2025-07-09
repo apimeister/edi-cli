@@ -1,6 +1,6 @@
 [package]
 name = "edi-cli"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 authors = ["Jens Walter <jens@apimeister.com>"]
 license = "MIT OR Apache-2.0"
@@ -21,4 +21,4 @@ serde_json = "1"
 encoding_rs = "0.8"
 lazy_static = "1.5"
 edifact-types = { version = "0.4" }
-x12-types = { version = "0.8" }
+x12-types = { version = "0.9.1" }

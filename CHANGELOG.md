@@ -1,3 +1,7 @@
+# 0.4.0 2025-07-09
+
+* update dependencies
+
 # 0.3.2 2025-01-07
 
 * update dependencies
