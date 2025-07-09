@@ -76,7 +76,7 @@ fn main() {
                 }
                 Encoding::Edifact => {
                     let (version, _type) = get_edifact_type(&str).unwrap();
-                    eprintln!("Edifact type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",version,_type);
+                    eprintln!("Edifact type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {version}/{_type}");
                     process::exit(1);
                 }
                 Encoding::X12 => {
@@ -185,7 +185,7 @@ fn main() {
                             serde_json::to_string(&edi).unwrap()
                         }
                         _ => {
-                            eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {}/{}",version,_type);
+                            eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {version}/{_type}");
                             process::exit(1);
                         }
                     };
@@ -461,7 +461,7 @@ ST*310*35353~"#;
     let result = get_x12_type(str).unwrap();
     let version = result.0;
     let doctype = result.1;
-    println!("{}/{}", version, doctype);
+    println!("{version}/{doctype}");
     assert_eq!(version, "004010");
     assert_eq!(doctype, "310");
 }
@@ -475,7 +475,7 @@ DTM+137:202201010021:203'"#;
     let result = get_edifact_type(str).unwrap();
     let version = result.0;
     let doctype = result.1;
-    println!("{}/{}", version, doctype);
+    println!("{version}/{doctype}");
     assert_eq!(version, "D00B");
     assert_eq!(doctype, "IFTSTA");
 }
@@ -484,7 +484,7 @@ DTM+137:202201010021:203'"#;
 fn check_for_una() {
     let str = r#"UNA:+.? 'UNB+UNOC:3+SENDER+CRECEIVER+221121:1422+1291'UNH+"#;
     let result = get_encoding(str);
-    println!("{:?}", result);
+    println!("{result:?}");
     assert_eq!(result, Encoding::Edifact);
 }
 
@@ -492,7 +492,7 @@ fn check_for_una() {
 fn check_for_unb() {
     let str = r#"UNB+UNOC:3+SNDR+RCVR+221121:1422+1291'UNH+"#;
     let result = get_encoding(str);
-    println!("{:?}", result);
+    println!("{result:?}");
     assert_eq!(result, Encoding::Edifact);
 }
 
@@ -500,5 +500,5 @@ fn check_for_unb() {
 fn check_edifact_cuscar() {
     let str = "UNB+UNOC:3+HKGHKG999+BLI-CUS+221121:0430+336'UNH+321+CUSCAR:D:96B:UN'BGM+85+CUSCAR/202211210430/+9'DTM+137:202211210430:203'RFF+AAZ:SUDU'NAD+MS+HSA'CTA+IC+:DAVID ZHANG/852-34788102'NAD+BA+HSA'TDT+20+246N+1+++++9178393:146:11:MERATUS MEDAN 5:ID'DTM+133:20221122:102'GIS+23'EQD+CN+MRKU7178024::ZZZ+22G1+++5'TSR++2:::2'MEA+AAE+T+KGM:2170'SEL+ML-ID0212928'EQD+CN+MSKU5705452::ZZZ+22G1+++5'TSR++2:::2'MEA+AAE+T+KGM:2180'SEL+ML-ID0212929'EQD+CN+GLDU5592412::ZZZ+22G1++";
     let result = get_edifact_type(str).unwrap();
-    println!("{:?}", result);
+    println!("{result:?}");
 }
