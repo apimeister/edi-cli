@@ -11,6 +11,148 @@ use std::{
 };
 use x12_types::{util::Parser, *};
 
+/// Generates the `(version, doctype)` dispatch table for both conversion
+/// directions from a single source of truth.
+///
+/// Each entry maps an X12 envelope `(GS-08 version, ST-01 transaction set)`
+/// pair to the matching `x12-types` module and document type, e.g.
+/// `("005010", "850", v005010, _850)`.
+macro_rules! x12_dispatch {
+    ( $( ($ver:literal, $ty:literal, $module:ident, $doc:ident) ),* $(,)? ) => {
+        /// Parse an X12 document of the given `(version, doctype)` into JSON.
+        /// Returns `None` if the pair is not supported.
+        fn x12_to_json(version: &str, doctype: &str, input: &str) -> Option<String> {
+            let json = match (version, doctype) {
+                $(
+                    ($ver, $ty) => {
+                        let (_rest, edi) =
+                            $module::Transmission::<$module::$doc>::parse(input).unwrap();
+                        serde_json::to_string(&edi).unwrap()
+                    }
+                )*
+                _ => return None,
+            };
+            Some(json)
+        }
+
+        /// Render a JSON document of the given `(version, doctype)` back into X12.
+        /// Returns `None` if the pair is not supported.
+        fn json_to_x12(version: &str, doctype: &str, input: &str) -> Option<String> {
+            let edi = match (version, doctype) {
+                $(
+                    ($ver, $ty) => {
+                        let edi: $module::Transmission<$module::$doc> =
+                            serde_json::from_str(input).unwrap();
+                        format!("{edi}")
+                    }
+                )*
+                _ => return None,
+            };
+            Some(edi)
+        }
+    };
+}
+
+x12_dispatch! {
+    // v003030
+    ("003030", "998", v003030, _998),
+
+    // v004010
+    ("004010", "204", v004010, _204),
+    ("004010", "214", v004010, _214),
+    ("004010", "301", v004010, _301),
+    ("004010", "309", v004010, _309),
+    ("004010", "310", v004010, _310),
+    ("004010", "315", v004010, _315),
+    ("004010", "322", v004010, _322),
+    ("004010", "404", v004010, _404),
+    ("004010", "810", v004010, _810),
+    ("004010", "856", v004010, _856),
+    ("004010", "940", v004010, _940),
+    ("004010", "945", v004010, _945),
+    ("004010", "997", v004010, _997),
+    ("004010", "998", v004010, _998),
+
+    // v005010
+    ("005010", "148", v005010, _148),
+    ("005010", "163", v005010, _163),
+    ("005010", "180", v005010, _180),
+    ("005010", "204", v005010, _204),
+    ("005010", "210", v005010, _210),
+    ("005010", "211", v005010, _211),
+    ("005010", "212", v005010, _212),
+    ("005010", "214", v005010, _214),
+    ("005010", "216", v005010, _216),
+    ("005010", "217", v005010, _217),
+    ("005010", "270", v005010, _270),
+    ("005010", "271", v005010, _271),
+    ("005010", "274", v005010, _274),
+    ("005010", "275", v005010, _275),
+    ("005010", "276", v005010, _276),
+    ("005010", "277", v005010, _277),
+    ("005010", "278", v005010, _278),
+    ("005010", "300", v005010, _300),
+    ("005010", "301", v005010, _301),
+    ("005010", "303", v005010, _303),
+    ("005010", "304", v005010, _304),
+    ("005010", "309", v005010, _309),
+    ("005010", "310", v005010, _310),
+    ("005010", "315", v005010, _315),
+    ("005010", "350", v005010, _350),
+    ("005010", "353", v005010, _353),
+    ("005010", "404", v005010, _404),
+    ("005010", "417", v005010, _417),
+    ("005010", "425", v005010, _425),
+    ("005010", "753", v005010, _753),
+    ("005010", "754", v005010, _754),
+    ("005010", "810", v005010, _810),
+    ("005010", "811", v005010, _811),
+    ("005010", "812", v005010, _812),
+    ("005010", "816", v005010, _816),
+    ("005010", "820", v005010, _820),
+    ("005010", "821", v005010, _821),
+    ("005010", "822", v005010, _822),
+    ("005010", "823", v005010, _823),
+    ("005010", "824", v005010, _824),
+    ("005010", "830", v005010, _830),
+    ("005010", "832", v005010, _832),
+    ("005010", "834", v005010, _834),
+    ("005010", "835", v005010, _835),
+    ("005010", "837", v005010, _837),
+    ("005010", "840", v005010, _840),
+    ("005010", "843", v005010, _843),
+    ("005010", "845", v005010, _845),
+    ("005010", "846", v005010, _846),
+    ("005010", "850", v005010, _850),
+    ("005010", "852", v005010, _852),
+    ("005010", "855", v005010, _855),
+    ("005010", "856", v005010, _856),
+    ("005010", "857", v005010, _857),
+    ("005010", "860", v005010, _860),
+    ("005010", "861", v005010, _861),
+    ("005010", "862", v005010, _862),
+    ("005010", "864", v005010, _864),
+    ("005010", "865", v005010, _865),
+    ("005010", "866", v005010, _866),
+    ("005010", "867", v005010, _867),
+    ("005010", "869", v005010, _869),
+    ("005010", "870", v005010, _870),
+    ("005010", "875", v005010, _875),
+    ("005010", "880", v005010, _880),
+    ("005010", "888", v005010, _888),
+    ("005010", "889", v005010, _889),
+    ("005010", "940", v005010, _940),
+    ("005010", "943", v005010, _943),
+    ("005010", "944", v005010, _944),
+    ("005010", "945", v005010, _945),
+    ("005010", "990", v005010, _990),
+    ("005010", "997", v005010, _997),
+    ("005010", "999", v005010, _999),
+
+    // v005030
+    ("005030", "404", v005030, _404),
+}
+
 fn main() {
     let matches = Command::new("edi")
         .version(std::env!("CARGO_PKG_VERSION"))
@@ -81,115 +223,13 @@ fn main() {
                 }
                 Encoding::X12 => {
                     let (version, _type) = get_x12_type(&str).unwrap();
-                    let json_str = match (version.as_str(), _type.as_str()) {
-                        ("003030", "998") => {
-                            let (_rest, edi) =
-                                v003030::Transmission::<v003030::_998>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "204") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_204>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "214") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_214>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "309") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_309>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "310") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_310>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "315") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_315>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "322") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_322>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "404") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_404>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "997") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_997>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("004010", "998") => {
-                            let (_rest, edi) =
-                                v004010::Transmission::<v004010::_998>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-
-                        ("005010", "834") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_834>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "835") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_835>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "837") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_837>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "270") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_270>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "271") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_271>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "276") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_276>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "277") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_277>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "820") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_820>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        ("005010", "999") => {
-                            let (_rest, edi) =
-                                v005010::Transmission::<v005010::_999>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-
-                        ("005030", "404") => {
-                            let (_rest, edi) =
-                                v005030::Transmission::<v005030::_404>::parse(&str).unwrap();
-                            serde_json::to_string(&edi).unwrap()
-                        }
-                        _ => {
+                    match x12_to_json(&version, &_type, &str) {
+                        Some(json_str) => println!("{json_str}"),
+                        None => {
                             eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {version}/{_type}");
                             process::exit(1);
                         }
-                    };
-                    println!("{json_str}");
+                    }
                 }
             }
         }
@@ -208,112 +248,13 @@ fn main() {
                 let segment1 = segments.as_array().unwrap().first().unwrap();
                 let st = segment1.get("st").unwrap();
                 let type_name = st.get("01").unwrap().as_str().unwrap();
-                let edi = match (version, type_name) {
-                    ("003030", "998") => {
-                        let edi: v003030::Transmission<v003030::_998> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
+                match json_to_x12(version, type_name, &str) {
+                    Some(edi) => println!("{edi}"),
+                    None => {
+                        eprintln!("X12 type not support. please open an issue under https://github.com/apimeister/edi-cli/ for type {version}/{type_name}");
+                        process::exit(1);
                     }
-                    ("004010", "204") => {
-                        let edi: v004010::Transmission<v004010::_204> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "214") => {
-                        let edi: v004010::Transmission<v004010::_214> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "309") => {
-                        let edi: v004010::Transmission<v004010::_309> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "310") => {
-                        let edi: v004010::Transmission<v004010::_310> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "315") => {
-                        let edi: v004010::Transmission<v004010::_315> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "322") => {
-                        let edi: v004010::Transmission<v004010::_322> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "404") => {
-                        let edi: v004010::Transmission<v004010::_404> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "997") => {
-                        let edi: v004010::Transmission<v004010::_997> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("004010", "998") => {
-                        let edi: v004010::Transmission<v004010::_998> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "834") => {
-                        let edi: v005010::Transmission<v005010::_834> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "835") => {
-                        let edi: v005010::Transmission<v005010::_835> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "837") => {
-                        let edi: v005010::Transmission<v005010::_837> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "270") => {
-                        let edi: v005010::Transmission<v005010::_270> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "271") => {
-                        let edi: v005010::Transmission<v005010::_271> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "276") => {
-                        let edi: v005010::Transmission<v005010::_276> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "277") => {
-                        let edi: v005010::Transmission<v005010::_277> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "820") => {
-                        let edi: v005010::Transmission<v005010::_820> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005010", "999") => {
-                        let edi: v005010::Transmission<v005010::_999> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    ("005030", "404") => {
-                        let edi: v005030::Transmission<v005030::_404> =
-                            serde_json::de::from_str(&str).unwrap();
-                        format!("{edi}")
-                    }
-                    _ => {
-                        unimplemented!()
-                    }
-                };
-                println!("{edi}");
+                }
             } else {
                 // EDIFACT processing
                 eprintln!("Edifact not yet supported.");
