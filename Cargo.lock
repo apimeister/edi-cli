@@ -911,9 +911,9 @@ checksum = "1ffae5123b2d3fc086436f8834ae3ab053a283cfac8fe0a0b8eaae044768a4c4"
 
 [[package]]
 name = "x12-types"
-version = "0.11.1"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b33b58984e21883d8d0248bb8628d01cfb79200cc1e24062bd4ccd8b7e34ab1a"
+checksum = "046e8a66e4780b786b8c43d5eb70c8d1ee0884b3a09a35e12bcb1b349e9e7c39"
 dependencies = [
  "chrono",
  "log",
